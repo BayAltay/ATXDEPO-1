@@ -8,60 +8,61 @@
     <script src="https://cdn.jsdelivr.net/npm/dompurify/dist/purify.min.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8f9fa; color: #212529; line-height: 1.6; padding-bottom: 80px; }
-        header { background-color: #1a252f; color: #ffffff; padding: 20px 0; border-bottom: 4px solid #34495e; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .container { max-width: 800px; margin: 0 auto; padding: 0 20px; }
-        .brand { font-size: 22px; font-weight: 700; color: #3498db; text-decoration: none; letter-spacing: 1px; }
-        main { margin-top: 40px; }
-        
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7fa; color: #1f2937; line-height: 1.6; padding-bottom: 100px; }
+        header { background-color: #0f1724; color: #ffffff; padding: 22px 0; border-bottom: 4px solid #111827; box-shadow: 0 2px 6px rgba(2,6,23,0.08); }
+        .container { max-width: 900px; margin: 0 auto; padding: 0 20px; }
+        .brand { font-size: 20px; font-weight: 700; color: #60a5fa; text-decoration: none; letter-spacing: 1px; }
+        main { margin-top: 34px; }
+
         /* Kategori Filtresi */
         .category-filter { 
             display: flex; 
             flex-wrap: wrap; 
             gap: 10px; 
-            margin-bottom: 30px; 
-            padding: 20px; 
+            margin-bottom: 24px; 
+            padding: 16px; 
             background-color: #ffffff; 
-            border-radius: 6px; 
-            border: 1px solid #e2e8f0;
+            border-radius: 8px; 
+            border: 1px solid #e6eef6;
         }
         .category-btn { 
-            padding: 8px 16px; 
-            border: 2px solid #3498db; 
+            padding: 8px 14px; 
+            border: 2px solid #60a5fa; 
             background-color: #ffffff; 
-            color: #3498db; 
-            border-radius: 20px; 
+            color: #60a5fa; 
+            border-radius: 999px; 
             cursor: pointer; 
             font-size: 13px; 
             font-weight: 600; 
-            transition: all 0.3s ease;
+            transition: all 0.25s ease;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
         .category-btn:hover { 
-            background-color: #ecf0f1; 
+            background-color: #f1f9ff; 
         }
         .category-btn.active { 
-            background-color: #3498db; 
+            background-color: #60a5fa; 
             color: #ffffff; 
         }
         .category-btn.all { 
-            border-color: #2c3e50; 
-            color: #2c3e50;
+            border-color: #111827; 
+            color: #111827;
         }
         .category-btn.all.active { 
-            background-color: #2c3e50; 
+            background-color: #111827; 
             color: #ffffff;
         }
         
-        .post-card { background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 6px; padding: 30px; margin-bottom: 25px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); transition: transform 0.3s ease, box-shadow 0.3s ease; }
-        .post-card:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        .post-card.hidden { display: none; }
+        .post-card { background-color: #ffffff; border: 1px solid #e6eef6; border-radius: 10px; margin-bottom: 18px; box-shadow: 0 6px 18px rgba(15,23,42,0.03); overflow: hidden; transition: transform 0.25s ease, box-shadow 0.25s ease; }
+        .post-card:hover { transform: translateY(-4px); box-shadow: 0 10px 30px rgba(15,23,42,0.06); }
         
-        .post-meta { font-size: 12px; color: #7f8c8d; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
-        .post-filename { color: #7f8c8d; }
+        .post-header { display:flex; align-items:center; justify-content:space-between; padding: 18px 20px; cursor:pointer; }
+        .post-title { font-size: 18px; font-weight: 700; color: #0f1724; }
+        .post-meta { font-size: 12px; color: #6b7280; text-transform: uppercase; letter-spacing: 1px; display: flex; gap:10px; align-items:center; }
+        .post-filename { color: #9ca3af; font-weight:600; font-size:12px; }
         .post-category { 
-            background-color: #3498db; 
+            background-color: #60a5fa; 
             color: #ffffff; 
             padding: 4px 10px; 
             border-radius: 12px; 
@@ -70,23 +71,39 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
-        
+        .chevron { transition: transform 0.25s ease; color: #9ca3af; margin-left:12px; }
+        .post-card.expanded .chevron { transform: rotate(180deg); color:#374151; }
+
+        .post-content { padding: 0 20px 18px 20px; color:#374151; }
+        .post-excerpt { padding: 0 0 12px 0; color:#4b5563; }
+        .post-full { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
+        .post-card.expanded .post-full { max-height: 4000px; }
+
         /* Kurumsal Markdown Metin Tasarımları */
-        .post-content h1 { font-size: 26px; color: #2c3e50; margin-bottom: 15px; font-weight: 600; }
-        .post-content h2 { font-size: 22px; color: #2c3e50; margin: 20px 0 10px 0; }
-        .post-content h3 { font-size: 18px; color: #34495e; margin: 15px 0 10px 0; }
-        .post-content p { margin-bottom: 15px; color: #4a5568; font-size: 15px; }
-        .post-content ul, .post-content ol { margin-left: 20px; margin-bottom: 15px; color: #4a5568; }
-        .post-content li { margin-bottom: 5px; }
-        .post-content code { background: #edf2f7; padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 14px; color: #e53e3e; }
-        
+        .post-content h1 { font-size: 22px; color: #0f1724; margin-bottom: 12px; font-weight: 700; }
+        .post-content h2 { font-size: 20px; color: #0f1724; margin: 16px 0 8px 0; }
+        .post-content h3 { font-size: 16px; color: #111827; margin: 12px 0 8px 0; }
+        .post-content p { margin-bottom: 12px; color: #4b5563; font-size: 15px; }
+        .post-content ul, .post-content ol { margin-left: 20px; margin-bottom: 12px; color: #4b5563; }
+        .post-content li { margin-bottom: 6px; }
+        .post-content code { background: #f3f4f6; padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 14px; color: #dc2626; }
+
         /* Durum Mesajları */
-        .status-message { text-align: center; color: #7f8c8d; padding: 40px; font-weight: 500; background: #ffffff; border-radius: 6px; border: 1px solid #e2e8f0; }
-        .status-message.error { color: #e74c3c; }
+        .status-message { text-align: center; color: #6b7280; padding: 30px; font-weight: 500; background: #ffffff; border-radius: 8px; border: 1px solid #e6eef6; }
+        .status-message.error { color: #e11d48; }
         
-        .no-posts { text-align: center; color: #7f8c8d; padding: 40px; font-weight: 500; }
+        .no-posts { text-align: center; color: #6b7280; padding: 24px; font-weight: 500; }
         
-        footer { background-color: #1a252f; color: #7f8c8d; text-align: center; padding: 20px 0; font-size: 13px; position: fixed; bottom: 0; width: 100%; border-top: 1px solid #2c3e50; }
+        footer { background-color: #0f1724; color: #9ca3af; text-align: center; padding: 18px 0; font-size: 13px; position: fixed; bottom: 0; width: 100%; border-top: 1px solid #111827; }
+        .footer-inner { display:flex; justify-content:center; gap:12px; align-items:center; }
+        .version-badge { background:#111827; color:#9ca3af; padding:6px 10px; border-radius:999px; font-weight:600; font-size:12px; }
+
+        /* Responsive */
+        @media (max-width:600px) {
+            .post-header { padding: 14px 16px; }
+            .post-title { font-size:16px; }
+            .post-content { padding: 0 16px 14px 16px; }
+        }
     </style>
 </head>
 <body>
@@ -102,7 +119,7 @@
     </main>
 
     <footer>
-        <div class="container">&copy; 2026 Anteax Team. Tüm Hakları Saklıdır.</div>
+        <div class="container footer-inner"><div>&copy; 2026 Anteax Team. Tüm Hakları Saklıdır.</div><div class="version-badge" id="engineVersion">ATX-B 0.4B</div></div>
     </footer>
 
     <script>
@@ -111,7 +128,10 @@
             username: "BayAltay",
             repo: "ATXDEPO-1",
             path: "blog",
-            requestDelay: 200
+            requestDelay: 250,
+            engineVersion: "ATX-B 0.4B",
+            // Eğer rate-limit sorun yaşarsan burada token ekleyebilirsin (tercihe bağlı):
+            // githubToken: "ghp_..."
         };
 
         const apiUrl = `https://api.github.com/repos/${CONFIG.username}/${CONFIG.repo}/contents/${CONFIG.path}`;
@@ -123,13 +143,20 @@
         // Gecikme Fonksiyonu (Rate Limiting)
         const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
+        // Yardımcı fetch (opsiyonel token desteği)
+        async function ghFetch(url) {
+            const headers = {};
+            if (CONFIG.githubToken) headers['Authorization'] = `token ${CONFIG.githubToken}`;
+            return fetch(url, { headers });
+        }
+
         // Ana Motor Fonksiyonu
         async function bloglariGetir() {
             const container = document.getElementById('blogContainer');
             const statusBox = document.getElementById('statusBox');
 
             try {
-                const response = await fetch(apiUrl);
+                const response = await ghFetch(apiUrl);
                 if (!response.ok) {
                     throw new Error("GitHub veri yoluna erişilemedi. Depo adını veya klasörü kontrol edin.");
                 }
@@ -140,15 +167,40 @@
                 }
                 
                 // Sadece .md uzantılı dosyaları filtrele
-                const mdDosyalari = veriler.filter(dosya => dosya.name && dosya.name.toLowerCase().endsWith('.md'));
+                let mdDosyalari = veriler.filter(dosya => dosya.name && dosya.name.toLowerCase().endsWith('.md'));
 
                 if (mdDosyalari.length === 0) {
                     statusBox.innerText = "Sistem klasöründe (.md) uzantılı herhangi bir döküman tespit edilemedi.";
                     return;
                 }
 
-                // Yükleniyor yazısını kaldır
+                // Yükleniyor yazısını kaldır (biz henüz kartları eklemeden önce)
                 statusBox.style.display = "none";
+
+                // Her dosya için en son commit bilgisini alarak tarihe göre sırala (yeniden düzenlenmiş: en yeni önce)
+                for (const dosya of mdDosyalari) {
+                    await delay(CONFIG.requestDelay);
+                    try {
+                        const commitsUrl = `https://api.github.com/repos/${CONFIG.username}/${CONFIG.repo}/commits?path=${CONFIG.path}/${encodeURIComponent(dosya.name)}&per_page=1`;
+                        const commitsResp = await ghFetch(commitsUrl);
+                        if (commitsResp && commitsResp.ok) {
+                            const commits = await commitsResp.json();
+                            if (Array.isArray(commits) && commits.length > 0 && commits[0].commit && commits[0].commit.author && commits[0].commit.author.date) {
+                                dosya._lastModified = new Date(commits[0].commit.author.date).getTime();
+                            } else {
+                                dosya._lastModified = 0; // fallback
+                            }
+                        } else {
+                            dosya._lastModified = 0; // fallback
+                        }
+                    } catch (e) {
+                        console.warn('Commit bilgisi alınamadı için fallback kullanılıyor:', dosya.name, e);
+                        dosya._lastModified = 0;
+                    }
+                }
+
+                // Dosyaları son değişiklik tarihine göre (desc) sırala
+                mdDosyalari.sort((a,b) => (b._lastModified || 0) - (a._lastModified || 0));
 
                 // Dosyaları sırayla oku ve ekrana bas
                 for (const dosya of mdDosyalari) {
@@ -169,25 +221,29 @@
         // Blog Yazısını Render Et
         async function renderBlogPost(dosya, container) {
             try {
-                const dosyaResponse = await fetch(dosya.download_url);
+                const dosyaResponse = await ghFetch(dosya.download_url);
                 if (!dosyaResponse.ok) {
                     throw new Error(`${dosya.name} indirilemedi`);
                 }
 
                 const markdownMetni = await dosyaResponse.text();
-                
-                // Kategoriyi markdown'ın başından çıkart
+
+                // Eski tarz category: satırını bul (geri uyumluluk için) - ama frontmatter desteği YOK
                 const kategoriRegex = /^category:\s*(.+?)$/m;
                 const kategoriMatch = markdownMetni.match(kategoriRegex);
                 const kategori = kategoriMatch ? kategoriMatch[1].trim() : "Diğer";
-                
-                // Metadata'yı sil
-                const temizMarkdown = markdownMetni.replace(/^category:.*$/m, '').trim();
-                
+
+                // Başlık: önce markdown içindeki ilk H1'i al, yoksa dosya adından başlık üret
+                const baslikMatch = markdownMetni.match(/^#\s+(.+)$/m);
+                const baslik = baslikMatch ? baslikMatch[1].trim() : dosya.name.replace(/\.md$/i, '').replace(/[-_]/g, ' ');
+
+                // Özet: ilk boş olmayan paragraf (başlık satırını atla)
+                const temizIcerik = markdownMetni.replace(/^category:.*$/m, '').trim();
+                const paragraflar = temizIcerik.split(/\n\s*\n/).map(p=>p.trim()).filter(p=>p.length>0 && !p.startsWith('#'));
+                const excerpt = paragraflar.length>0 ? paragraflar[0] : '';
+
                 // Markdown'ı HTML koduna dönüştür
-                const htmlIcerik = marked.parse(temizMarkdown);
-                
-                // XSS Koruması - DOMPurify ile Temizle
+                const htmlIcerik = marked.parse(temizIcerik);
                 const cleanHtml = DOMPurify.sanitize(htmlIcerik);
 
                 // Yeni kart yapısını oluştur
@@ -195,9 +251,23 @@
                 kart.className = 'post-card';
                 kart.setAttribute('data-category', kategori.toLowerCase());
 
-                // Meta bilgisini güvenli şekilde ekle
-                const metaDiv = document.createElement('div');
-                metaDiv.className = 'post-meta';
+                // Header (clickable)
+                const headerDiv = document.createElement('div');
+                headerDiv.className = 'post-header';
+                headerDiv.tabIndex = 0;
+                headerDiv.setAttribute('role','button');
+                headerDiv.setAttribute('aria-expanded','false');
+
+                const leftDiv = document.createElement('div');
+                leftDiv.style.display = 'flex';
+                leftDiv.style.flexDirection = 'column';
+
+                const titleSpan = document.createElement('div');
+                titleSpan.className = 'post-title';
+                titleSpan.textContent = baslik;
+
+                const metaSmall = document.createElement('div');
+                metaSmall.className = 'post-meta';
 
                 const filenameSpan = document.createElement('span');
                 filenameSpan.className = 'post-filename';
@@ -207,22 +277,67 @@
                 categorySpan.className = 'post-category';
                 categorySpan.textContent = kategori;
 
-                metaDiv.appendChild(filenameSpan);
-                metaDiv.appendChild(categorySpan);
+                metaSmall.appendChild(filenameSpan);
+                metaSmall.appendChild(categorySpan);
 
-                // İçeriği güvenli şekilde ekle
+                leftDiv.appendChild(titleSpan);
+                leftDiv.appendChild(metaSmall);
+
+                const rightDiv = document.createElement('div');
+                rightDiv.style.display = 'flex';
+                rightDiv.style.alignItems = 'center';
+
+                const chevron = document.createElement('span');
+                chevron.className = 'chevron';
+                chevron.innerHTML = '▾';
+
+                rightDiv.appendChild(chevron);
+
+                headerDiv.appendChild(leftDiv);
+                headerDiv.appendChild(rightDiv);
+
+                // İçerik alanı: excerpt (her zaman görünen) + full (expand ile açılan)
                 const contentDiv = document.createElement('div');
                 contentDiv.className = 'post-content';
-                contentDiv.innerHTML = cleanHtml;
 
-                kart.appendChild(metaDiv);
+                const excerptDiv = document.createElement('div');
+                excerptDiv.className = 'post-excerpt';
+                excerptDiv.textContent = excerpt ? excerpt.replace(/\n/g,' ') : '';
+
+                const fullDiv = document.createElement('div');
+                fullDiv.className = 'post-full';
+                fullDiv.innerHTML = cleanHtml;
+
+                contentDiv.appendChild(excerptDiv);
+                contentDiv.appendChild(fullDiv);
+
+                kart.appendChild(headerDiv);
                 kart.appendChild(contentDiv);
                 container.appendChild(kart);
+
+                // Event: toggle expand/collapse
+                function toggleExpand() {
+                    const expanded = kart.classList.toggle('expanded');
+                    headerDiv.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+                    // Scroll into view smoothly when expanding on small screens
+                    if (expanded) {
+                        setTimeout(()=> kart.scrollIntoView({ behavior: 'smooth', block: 'start' }), 150);
+                    }
+                }
+
+                headerDiv.addEventListener('click', toggleExpand);
+                headerDiv.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        toggleExpand();
+                    }
+                });
 
                 // Blog nesnesini kaydet
                 tumBloglar.push({
                     kategori: kategori.toLowerCase(),
-                    element: kart
+                    element: kart,
+                    lastModified: dosya._lastModified || 0
                 });
 
             } catch (dosyaHatasi) {
@@ -260,7 +375,7 @@
                 filterDiv.appendChild(btn);
             });
 
-            // Filtre div'ini containerın başına ekle
+            // Filtre div'ini containerın başına ekle (ilk önce)
             container.insertBefore(filterDiv, container.firstChild);
         }
 
@@ -272,16 +387,17 @@
             document.querySelectorAll('.category-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
-            document.querySelector(`[data-category="${secilenKategori}"]`).classList.add('active');
+            const selector = document.querySelector(`[data-category="${secilenKategori}"]`);
+            if (selector) selector.classList.add('active');
 
             // Yazıları filtrele
             let gorunenYazi = 0;
             tumBloglar.forEach(blog => {
                 if (secilenKategori === 'all' || blog.kategori === secilenKategori) {
-                    blog.element.classList.remove('hidden');
+                    blog.element.style.display = '';
                     gorunenYazi++;
                 } else {
-                    blog.element.classList.add('hidden');
+                    blog.element.style.display = 'none';
                 }
             });
 
@@ -303,9 +419,15 @@
             }
         }
 
+        // Footer sürümünü ayarla (dinamik)
+        document.addEventListener('DOMContentLoaded', () => {
+            const verSpan = document.getElementById('engineVersion');
+            if (verSpan) verSpan.textContent = CONFIG.engineVersion;
+        });
+
         // Sayfa yüklendiğinde motoru çalıştır
         window.addEventListener('DOMContentLoaded', bloglariGetir);
     </script>
 </body>
 </html>
-<!-- ==== Anteax Blog Engine | Atx-B 0.3 B ==== -->
+<!-- ==== Anteax Blog Engine | ATX-B 0.4B ==== -->
