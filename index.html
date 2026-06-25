@@ -3,74 +3,114 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Anteax Team - Otomatik Blog</title>
+    <title>Anteax Team - Resmi Blog</title>
+    <!-- Markdown İşleme Motoru -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8f9fa; color: #212529; line-height: 1.6; padding-bottom: 80px; }
-        header { background-color: #1a252f; color: #ffffff; padding: 20px 0; border-bottom: 4px solid #34495e; }
+        header { background-color: #1a252f; color: #ffffff; padding: 20px 0; border-bottom: 4px solid #34495e; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         .container { max-width: 800px; margin: 0 auto; padding: 0 20px; }
-        .brand { font-size: 22px; font-weight: 700; color: #3498db; text-decoration: none; }
+        .brand { font-size: 22px; font-weight: 700; color: #3498db; text-decoration: none; letter-spacing: 1px; }
         main { margin-top: 40px; }
         .post-card { background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 6px; padding: 30px; margin-bottom: 25px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
         .post-meta { font-size: 12px; color: #7f8c8d; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; }
-        .post-content h1, .post-content h2 { color: #2c3e50; margin: 15px 0 10px 0; }
-        .post-content p { margin-bottom: 15px; color: #4a5568; }
-        footer { background-color: #1a252f; color: #7f8c8d; text-align: center; padding: 20px 0; font-size: 13px; position: fixed; bottom: 0; width: 100%; }
+        
+        /* Kurumsal Markdown Metin Tasarımları */
+        .post-content h1 { font-size: 26px; color: #2c3e50; margin-bottom: 15px; font-weight: 600; }
+        .post-content h2 { font-size: 22px; color: #2c3e50; margin: 20px 0 10px 0; }
+        .post-content h3 { font-size: 18px; color: #34495e; margin: 15px 0 10px 0; }
+        .post-content p { margin-bottom: 15px; color: #4a5568; font-size: 15px; }
+        .post-content ul, .post-content ol { margin-left: 20px; margin-bottom: 15px; color: #4a5568; }
+        .post-content li { margin-bottom: 5px; }
+        .post-content code { background: #edf2f7; padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 14px; color: #e53e3e; }
+        
+        /* Durum Mesajları */
+        .status-message { text-align: center; color: #7f8c8d; padding: 40px; font-weight: 500; background: #ffffff; border-radius: 6px; border: 1px solid #e2e8f0; }
+        
+        footer { background-color: #1a252f; color: #7f8c8d; text-align: center; padding: 20px 0; font-size: 13px; position: fixed; bottom: 0; width: 100%; border-top: 1px solid #2c3e50; }
     </style>
 </head>
 <body>
 
     <header>
         <div class="container">
-            <a href="#" class="brand">ANTEAX TEAM OTOMATİK BLOG</a>
+            <a href="index.html" class="brand">ANTEAX TEAM MERKEZİ BLOG</a>
         </div>
     </header>
 
     <main class="container" id="blogContainer">
-        </main>
+        <div id="statusBox" class="status-message">Anteax veri ağına bağlanılıyor, dökümanlar yükleniyor...</div>
+    </main>
 
     <footer>
-        <div class="container">&copy; 2026 Anteax Team. Altyapı Yönetimi.</div>
+        <div class="container">&copy; 2026 Anteax Team. Tüm Hakları Saklıdır.</div>
     </footer>
 
     <script>
-        // DIKKAT: Buradaki bilgileri kendi hesabına göre doldur aga!
-        const githubKullaniciAdi = "BayAltay"; 
-        const depoAdi = "ATXDEPO-1"; 
+        // Tanımlanan Resmi GitHub API Bilgileri
+        const username = "BayAltay";
+        const repo = "ATXDEPO-1";
+        const path = "blog";
 
-        // 1. Adım: GitHub API'sini kullanarak blog klasöründeki tüm dosyaları listeliyoruz
-        const apiUrl = `https://api.github.com/repos/${githubKullaniciAdi}/${depoAdi}/contents/blog`;
+        const apiUrl = `https://api.github.com/repos/${username}/${repo}/contents/${path}`;
 
-        fetch(apiUrl)
-            .then(response => response.json())
-            .then(dosyalar => {
-                const container = document.getElementById('blogContainer');
+        // Asenkron Motor Fonksiyonu (Sıralı ve Güvenli Yükleme İçin)
+        async function bloglariGetir() {
+            const container = document.getElementById('blogContainer');
+            const statusBox = document.getElementById('statusBox');
+
+            try {
+                const response = await fetch(apiUrl);
+                if (!response.ok) {
+                    throw new Error("GitHub veri yoluna erişilemedi. Depo adını veya klasörü kontrol edin.");
+                }
+
+                const veriler = await response.json();
                 
-                // Sadece .md uzantılı olan dosyaları filtreliyoruz
-                const mdDosyalari = dosyalar.filter(dosya => dosya.name.endsWith('.md'));
+                // Sadece .md uzantılı dosyaları filtrele
+                const mdDosyalari = veriler.filter(dosya => dosya.name.toLowerCase().endsWith('.md'));
 
-                mdDosyalari.forEach(dosya => {
-                    // 2. Adım: Her bir .md dosyasının içeriğini çekiyoruz
-                    fetch(dosya.download_url)
-                        .then(res => res.text())
-                        .then(markdownMetni => {
-                            // 3. Adım: Markdown'ı HTML'e çevirip ekrana basıyoruz
-                            const htmlIcerik = marked.parse(markdownMetni);
-                            
-                            const kart = document.createElement('article');
-                            kart.className = 'post-card';
-                            
-                            // Dosya adından veya içeriğinden tarih türetilebilir, şimdilik dosya adını gösterelim
-                            kart.innerHTML = `
-                                <div class="post-meta">Sistem Dosyası: ${dosya.name}</div>
-                                <div class="post-content">${htmlIcerik}</div>
-                            `;
-                            container.appendChild(kart);
-                        });
-                });
-            })
-            .catch(err => console.error("GitHub API bağlantı hatası:", err));
+                if (mdDosyalari.length === 0) {
+                    statusBox.innerText = "Sistem klasöründe (.md) uzantılı herhangi bir döküman tespit edilemedi.";
+                    return;
+                }
+
+                // Yükleniyor yazısını kaldır
+                statusBox.style.display = "none";
+
+                // Dosyaları sırayla oku ve ekrana bas (Asenkron Döngü)
+                for (const dosya of mdDosyalari) {
+                    try {
+                        const dosyaResponse = await fetch(dosya.download_url);
+                        const markdownMetni = await dosyaResponse.text();
+                        
+                        // Markdown'ı HTML koduna dönüştür
+                        const htmlIcerik = marked.parse(markdownMetni);
+
+                        // Yeni kart yapısını oluştur
+                        const kart = document.createElement('article');
+                        kart.className = 'post-card';
+                        kart.innerHTML = `
+                            <div class="post-meta">Sistem Arşivi: ${dosya.name}</div>
+                            <div class="post-content">${htmlIcerik}</div>
+                        `;
+                        
+                        container.appendChild(kart);
+                    } catch (dosyaHatasi) {
+                        console.error(`${dosya.name} içeriği okunurken hata:`, dosyaHatasi);
+                    }
+                }
+
+            } catch (anaHata) {
+                statusBox.style.color = "#e74c3c";
+                statusBox.innerText = `Bağlantı Başarısız: Sunucu verileri çekemedi. (Detay: ${anaHata.message})`;
+                console.error("Sistem Hatası:", anaHata);
+            }
+        }
+
+        // Sayfa yüklendiğinde motoru çalıştır
+        window.addEventListener('DOMContentLoaded', bloglariGetir);
     </script>
 </body>
 </html>
