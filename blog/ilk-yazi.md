@@ -1,3 +1,4 @@
+category:yeni
 # Yeni Altyapı Başarıyla Kuruldu
 
 Anteax Team resmi web blog altyapısı tamamen **Markdown (.md)** tabanlı sisteme geçirilmiştir.
