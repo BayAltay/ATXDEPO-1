@@ -8,114 +8,134 @@
     <script src="https://cdn.jsdelivr.net/npm/dompurify/dist/purify.min.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7fa; color: #1f2937; line-height: 1.6; padding-bottom: 100px; }
-        header { background-color: #0f1724; color: #ffffff; padding: 22px 0; border-bottom: 4px solid #111827; box-shadow: 0 2px 6px rgba(2,6,23,0.08); }
-        .container { max-width: 900px; margin: 0 auto; padding: 0 20px; }
-        .brand { font-size: 20px; font-weight: 700; color: #60a5fa; text-decoration: none; letter-spacing: 1px; }
-        main { margin-top: 34px; }
+        body { font-family: Inter, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f6f8fb; color: #0f1724; line-height: 1.6; padding-bottom: 120px; }
+        header { background: linear-gradient(90deg,#0f1724 0%,#0b3a57 100%); color: #fff; padding: 28px 0; box-shadow: 0 6px 24px rgba(2,6,23,0.08); }
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+        .brand { font-size: 22px; font-weight: 800; color: #bde0fe; text-decoration: none; letter-spacing: 1px; }
+        .header-row { display:flex; justify-content:space-between; align-items:center; gap:16px; }
+        .header-sub { color: #c7d2fe; font-size:14px; opacity:0.9 }
 
-        /* Kategori Filtresi */
+        main { margin-top: 28px; }
+
+        /* Layout: posts + sidebar */
+        #blogContainer { display: grid; grid-template-columns: 1fr 320px; gap: 24px; align-items: start; }
+        @media (max-width: 980px) { #blogContainer { grid-template-columns: 1fr; } }
+
+        /* Category filter sits in left column */
         .category-filter { 
             display: flex; 
             flex-wrap: wrap; 
             gap: 10px; 
-            margin-bottom: 24px; 
-            padding: 16px; 
+            margin-bottom: 16px; 
+            padding: 14px; 
             background-color: #ffffff; 
-            border-radius: 8px; 
+            border-radius: 10px; 
             border: 1px solid #e6eef6;
+            grid-column: 1 / 2;
         }
         .category-btn { 
-            padding: 8px 14px; 
-            border: 2px solid #60a5fa; 
-            background-color: #ffffff; 
-            color: #60a5fa; 
+            padding: 8px 12px; 
+            border: 1px solid #c7e0ff; 
+            background-color: #fff; 
+            color: #0f1724; 
             border-radius: 999px; 
             cursor: pointer; 
             font-size: 13px; 
-            font-weight: 600; 
-            transition: all 0.25s ease;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            font-weight: 700; 
+            transition: all 0.18s ease;
         }
-        .category-btn:hover { 
-            background-color: #f1f9ff; 
-        }
-        .category-btn.active { 
-            background-color: #60a5fa; 
-            color: #ffffff; 
-        }
-        .category-btn.all { 
-            border-color: #111827; 
-            color: #111827;
-        }
-        .category-btn.all.active { 
-            background-color: #111827; 
-            color: #ffffff;
-        }
-        
-        .post-card { background-color: #ffffff; border: 1px solid #e6eef6; border-radius: 10px; margin-bottom: 18px; box-shadow: 0 6px 18px rgba(15,23,42,0.03); overflow: hidden; transition: transform 0.25s ease, box-shadow 0.25s ease; }
-        .post-card:hover { transform: translateY(-4px); box-shadow: 0 10px 30px rgba(15,23,42,0.06); }
-        
-        .post-header { display:flex; align-items:center; justify-content:space-between; padding: 18px 20px; cursor:pointer; }
-        .post-title { font-size: 18px; font-weight: 700; color: #0f1724; }
-        .post-meta { font-size: 12px; color: #6b7280; text-transform: uppercase; letter-spacing: 1px; display: flex; gap:10px; align-items:center; }
-        .post-filename { color: #9ca3af; font-weight:600; font-size:12px; }
-        .post-category { 
-            background-color: #60a5fa; 
-            color: #ffffff; 
-            padding: 4px 10px; 
-            border-radius: 12px; 
-            font-size: 11px; 
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .chevron { transition: transform 0.25s ease; color: #9ca3af; margin-left:12px; }
-        .post-card.expanded .chevron { transform: rotate(180deg); color:#374151; }
+        .category-btn:hover { transform: translateY(-2px); background:#f1fbff }
+        .category-btn.active { background:#0b3a57; color:#fff; border-color:transparent }
 
-        .post-content { padding: 0 20px 18px 20px; color:#374151; }
-        .post-excerpt { padding: 0 0 12px 0; color:#4b5563; }
-        .post-full { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
-        .post-card.expanded .post-full { max-height: 4000px; }
+        /* Hero / Featured area */
+        .hero { background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0)); border-radius: 12px; padding: 22px; display:flex; gap:18px; align-items:center; justify-content:space-between; grid-column: 1 / 2; }
+        .hero .hero-left { max-width: 68%; }
+        .hero h1 { font-size: 28px; color: #fff; margin-bottom:8px; }
+        .hero p { color: #dbeafe; margin-bottom:0; }
+        .cta-btn { background:#60a5fa; color:#07203a; padding:10px 14px; border-radius:10px; font-weight:700; box-shadow: 0 6px 18px rgba(96,165,250,0.18); border: none; cursor:pointer }
 
-        /* Kurumsal Markdown Metin Tasarımları */
-        .post-content h1 { font-size: 22px; color: #0f1724; margin-bottom: 12px; font-weight: 700; }
-        .post-content h2 { font-size: 20px; color: #0f1724; margin: 16px 0 8px 0; }
-        .post-content h3 { font-size: 16px; color: #111827; margin: 12px 0 8px 0; }
-        .post-content p { margin-bottom: 12px; color: #4b5563; font-size: 15px; }
-        .post-content ul, .post-content ol { margin-left: 20px; margin-bottom: 12px; color: #4b5563; }
-        .post-content li { margin-bottom: 6px; }
-        .post-content code { background: #f3f4f6; padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 14px; color: #dc2626; }
+        /* Posts list */
+        .posts-list { display: flex; flex-direction: column; gap: 18px; grid-column: 1 / 2; }
 
-        /* Durum Mesajları */
-        .status-message { text-align: center; color: #6b7280; padding: 30px; font-weight: 500; background: #ffffff; border-radius: 8px; border: 1px solid #e6eef6; }
-        .status-message.error { color: #e11d48; }
-        
-        .no-posts { text-align: center; color: #6b7280; padding: 24px; font-weight: 500; }
-        
-        footer { background-color: #0f1724; color: #9ca3af; text-align: center; padding: 18px 0; font-size: 13px; position: fixed; bottom: 0; width: 100%; border-top: 1px solid #111827; }
+        .post-card { background-color: #fff; border: 1px solid #eef4fb; border-radius: 12px; overflow: hidden; transition: transform .18s ease, box-shadow .18s ease; display:block; }
+        .post-card:hover { transform: translateY(-6px); box-shadow: 0 18px 40px rgba(11,26,40,0.06); }
+
+        .post-header { display:flex; gap:16px; align-items:flex-start; padding: 18px; cursor:pointer; }
+        .post-thumbnail { width:84px; height:84px; border-radius:8px; background: linear-gradient(135deg,#e6f3ff,#d6e9ff); flex:0 0 84px; display:flex; align-items:center; justify-content:center; color:#0b3a57; font-weight:800; }
+        .post-meta { display:flex; gap:8px; align-items:center; color:#6b7280; font-size:13px; }
+        .post-title { font-size:18px; font-weight:800; color:#0f1724; margin-bottom:8px; }
+        .post-excerpt { color:#475569; font-size:15px; }
+
+        .post-body { padding: 0 18px 18px 18px; color:#334155; }
+        .post-full { max-height: 0; overflow: hidden; transition: max-height 0.36s ease; }
+        .post-card.expanded .post-full { max-height: 5000px; }
+        .post-card.expanded .post-body { border-top: 1px solid #eef4fb; }
+
+        /* Sidebar */
+        .sidebar { background:#fff; border: 1px solid #eef4fb; border-radius: 12px; padding: 16px; height: fit-content; position: relative; }
+        .sidebar h3 { font-size:16px; margin-bottom:12px; color:#0f1724 }
+        .search-input { width:100%; padding:10px 12px; border-radius:10px; border:1px solid #e6eef6; margin-bottom:12px; }
+        .recent-list { display:flex; flex-direction:column; gap:8px; }
+        .recent-item { font-size:14px; color:#0f1724; text-decoration:none; padding:8px; border-radius:8px; transition:background .12s; }
+        .recent-item:hover { background:#f6fbff }
+        .tag { display:inline-block; padding:6px 10px; background:#f1f8ff; color:#0b3a57; border-radius:999px; font-weight:700; font-size:13px; margin:4px 6px 0 0 }
+
+        /* Status message sits in left column */
+        .status-message { grid-column: 1 / 2; text-align:center; color:#6b7280; padding: 26px; font-weight:600; background:#fff; border-radius:10px; border:1px solid #eef4fb }
+
+        footer { background: #071425; color: #9ca3af; text-align: center; padding: 18px 0; font-size:13px; position: fixed; bottom: 0; width: 100%; border-top: 1px solid rgba(255,255,255,0.02); }
         .footer-inner { display:flex; justify-content:center; gap:12px; align-items:center; }
-        .version-badge { background:#111827; color:#9ca3af; padding:6px 10px; border-radius:999px; font-weight:600; font-size:12px; }
+        .version-badge { background:transparent; color:#9ca3af; padding:6px 10px; border-radius:999px; font-weight:600; font-size:12px; border:1px solid rgba(255,255,255,0.03) }
 
-        /* Responsive */
-        @media (max-width:600px) {
-            .post-header { padding: 14px 16px; }
-            .post-title { font-size:16px; }
-            .post-content { padding: 0 16px 14px 16px; }
-        }
+        /* small screens tweaks */
+        @media (max-width:600px) { .hero h1 { font-size:20px } .post-header { padding:14px } .post-thumbnail { width:64px; height:64px } }
     </style>
 </head>
 <body>
 
     <header>
-        <div class="container">
-            <a href="index.html" class="brand">ANTEAX TEAM MERKEZİ BLOG</a>
+        <div class="container header-row">
+            <div>
+                <a href="index.html" class="brand">ANTEAX TEAM</a>
+                <div class="header-sub">Resmi Blog · Haberler ve Dökümanlar</div>
+            </div>
+            <div>
+                <button class="cta-btn">Yeni Yazı Ekle</button>
+            </div>
         </div>
     </header>
 
     <main class="container" id="blogContainer">
+        <!-- Hero / featured area (purely presentational) -->
+        <section class="hero">
+            <div class="hero-left">
+                <h1>Anteax Team Güncellemeleri ve Yazıları</h1>
+                <p>En son haberler, teknik makaleler ve deploy notları burada. Kartlara tıklayarak yazıyı açabilirsiniz.</p>
+            </div>
+            <div>
+                <div class="tag">ATX-B 0.4B</div>
+            </div>
+        </section>
+
+        <!-- Status message (initial) -->
         <div id="statusBox" class="status-message">Anteax veri ağına bağlanılıyor, dökümanlar yükleniyor...</div>
+
+        <!-- Sidebar (static/presentational) -->
+        <aside class="sidebar">
+            <h3>Ara</h3>
+            <input class="search-input" placeholder="Başlık / Özet ara (henüz client-side değil)" disabled />
+            <h3>Son Yazılar</h3>
+            <div class="recent-list">
+                <div class="recent-item">Yükleniyor...</div>
+            </div>
+            <h3 style="margin-top:12px">Etiketler</h3>
+            <div>
+                <span class="tag">Genel</span>
+                <span class="tag">Teknoloji</span>
+                <span class="tag">Duyuru</span>
+            </div>
+        </aside>
+
     </main>
 
     <footer>
@@ -211,6 +231,9 @@
                 // Kategori filtresi oluştur
                 kategoriFilteriOlustur();
 
+                // Sidebar: populate recent list (simple, non-invasive)
+                populateRecentSidebar();
+
             } catch (anaHata) {
                 statusBox.classList.add('error');
                 statusBox.innerText = `Bağlantı Başarısız: ${anaHata.message}`;
@@ -258,9 +281,12 @@
                 headerDiv.setAttribute('role','button');
                 headerDiv.setAttribute('aria-expanded','false');
 
-                const leftDiv = document.createElement('div');
-                leftDiv.style.display = 'flex';
-                leftDiv.style.flexDirection = 'column';
+                const thumb = document.createElement('div');
+                thumb.className = 'post-thumbnail';
+                thumb.textContent = baslik.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase();
+
+                const metaWrap = document.createElement('div');
+                metaWrap.style.flex = '1';
 
                 const titleSpan = document.createElement('div');
                 titleSpan.className = 'post-title';
@@ -280,8 +306,13 @@
                 metaSmall.appendChild(filenameSpan);
                 metaSmall.appendChild(categorySpan);
 
-                leftDiv.appendChild(titleSpan);
-                leftDiv.appendChild(metaSmall);
+                const excerptDiv = document.createElement('div');
+                excerptDiv.className = 'post-excerpt';
+                excerptDiv.textContent = excerpt ? excerpt.replace(/\n/g,' ') : '';
+
+                metaWrap.appendChild(titleSpan);
+                metaWrap.appendChild(excerptDiv);
+                metaWrap.appendChild(metaSmall);
 
                 const rightDiv = document.createElement('div');
                 rightDiv.style.display = 'flex';
@@ -293,33 +324,29 @@
 
                 rightDiv.appendChild(chevron);
 
-                headerDiv.appendChild(leftDiv);
+                headerDiv.appendChild(thumb);
+                headerDiv.appendChild(metaWrap);
                 headerDiv.appendChild(rightDiv);
 
-                // İçerik alanı: excerpt (her zaman görünen) + full (expand ile açılan)
-                const contentDiv = document.createElement('div');
-                contentDiv.className = 'post-content';
-
-                const excerptDiv = document.createElement('div');
-                excerptDiv.className = 'post-excerpt';
-                excerptDiv.textContent = excerpt ? excerpt.replace(/\n/g,' ') : '';
+                const bodyDiv = document.createElement('div');
+                bodyDiv.className = 'post-body';
 
                 const fullDiv = document.createElement('div');
                 fullDiv.className = 'post-full';
                 fullDiv.innerHTML = cleanHtml;
 
-                contentDiv.appendChild(excerptDiv);
-                contentDiv.appendChild(fullDiv);
+                bodyDiv.appendChild(fullDiv);
 
                 kart.appendChild(headerDiv);
-                kart.appendChild(contentDiv);
+                kart.appendChild(bodyDiv);
+
+                // Append into container (left column)
                 container.appendChild(kart);
 
                 // Event: toggle expand/collapse
                 function toggleExpand() {
                     const expanded = kart.classList.toggle('expanded');
                     headerDiv.setAttribute('aria-expanded', expanded ? 'true' : 'false');
-                    // Scroll into view smoothly when expanding on small screens
                     if (expanded) {
                         setTimeout(()=> kart.scrollIntoView({ behavior: 'smooth', block: 'start' }), 150);
                     }
@@ -416,6 +443,38 @@
                 if (mesajDiv) {
                     mesajDiv.remove();
                 }
+            }
+        }
+
+        // Populate sidebar recent list (non-invasive, purely presentational)
+        function populateRecentSidebar() {
+            const recentContainer = document.querySelector('.recent-list');
+            if (!recentContainer) return;
+            recentContainer.innerHTML = '';
+            // Show up to 6 recent posts (we already sorted by lastModified)
+            const sorted = tumBloglar.slice().sort((a,b)=> (b.lastModified||0)-(a.lastModified||0));
+            const max = Math.min(sorted.length, 6);
+            if (max === 0) {
+                recentContainer.innerHTML = '<div class="recent-item">Henüz yazı yok</div>';
+                return;
+            }
+            for (let i=0;i<max;i++) {
+                const it = sorted[i];
+                const a = document.createElement('a');
+                a.href = '#';
+                a.className = 'recent-item';
+                // try to read title from element
+                const titleEl = it.element.querySelector('.post-title');
+                a.textContent = titleEl ? titleEl.textContent : 'Yazı';
+                a.addEventListener('click', (e)=>{
+                    e.preventDefault();
+                    it.element.scrollIntoView({behavior:'smooth', block:'center'});
+                    // open it
+                    it.element.classList.add('expanded');
+                    const hdr = it.element.querySelector('[role="button"]');
+                    if (hdr) hdr.setAttribute('aria-expanded','true');
+                });
+                recentContainer.appendChild(a);
             }
         }
 
