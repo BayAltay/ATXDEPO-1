@@ -1,9 +1,8 @@
 Category:Sistem
-
 # Blog Sitemiz İçin Yeni Sistem
 kodladığımız Bu sistemde , Atx-B motorlarını Kulanıyor ve sürekli günceliyoruz şuanda 3 sürüm Bulunmaktadır!
 
-- Atx-B 0.1A(deneysel İlk sürüm Basit Repo yönlendirmesi
+- Atx-B 0.1A(deneysel İlk sürüm Basit Repo yönlendirmesi)
 - Atx-B 0.2A ( Xss Koruması Getirildi )
 - Atx-B 0.3B (Blog Kategori sistemi Geldi)
 
