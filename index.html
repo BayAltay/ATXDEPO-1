@@ -36,11 +36,11 @@
 
     <script>
         // DIKKAT: Buradaki bilgileri kendi hesabına göre doldur aga!
-        const githubKullaniciAdi = "GITHUB_KULLANICI_ADIN"; 
-        const depoAdi = "DEPO_ADIN"; 
+        const githubKullaniciAdi = "BayAltay"; 
+        const depoAdi = "ATXDEPO-1"; 
 
         // 1. Adım: GitHub API'sini kullanarak blog klasöründeki tüm dosyaları listeliyoruz
-        const apiUrl = `https://api.github.com/repos/${BayAltay}/${ATXDEPO-1}/contents/blog`;
+        const apiUrl = `https://api.github.com/repos/${githubKullaniciAdi}/${depoAdi}/contents/blog`;
 
         fetch(apiUrl)
             .then(response => response.json())
