@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kişisel Blog & Portfolyo</title>
+    <style>
+        /* Kurumsal ve Resmi Stil Temelleri */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: #212529;
+            line-height: 1.6;
+            padding-bottom: 80px;
+        }
+
+        /* Navigasyon / Başlık Alanı */
+        header {
+            background-color: #1a252f;
+            color: #ffffff;
+            padding: 20px 0;
+            border-bottom: 4px solid #34495e;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .header-content {
+            display: table;
+            width: 100%;
+        }
+
+        .brand {
+            display: table-cell;
+            vertical-align: middle;
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-links {
+            display: table-cell;
+            text-align: right;
+            vertical-align: middle;
+        }
+
+        .nav-links a {
+            color: #ecf0f1;
+            text-decoration: none;
+            margin-left: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+
+        .nav-links a:hover {
+            color: #3498db;
+        }
+
+        /* Ana İçerik Düzeni */
+        main {
+            margin-top: 40px;
+        }
+
+        /* Blok Gönderi Kartları */
+        .post-card {
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .post-meta {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .post-title {
+            font-size: 22px;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .post-excerpt {
+            color: #555555;
+            font-size: 15px;
+            margin-bottom: 20px;
+        }
+
+        /* İnteraktif Butonlar */
+        .btn {
+            display: inline-block;
+            background-color: #2c3e50;
+            color: #ffffff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.2s ease;
+        }
+
+        .btn:hover {
+            background-color: #34495e;
+        }
+
+        /* Alt Bilgi */
+        footer {
+            background-color: #1a252f;
+            color: #7f8c8d;
+            text-align: center;
+            padding: 20px 0;
+            font-size: 13px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            border-top: 1px solid #2c3e50;
+        }
+
+        /* Bildirim Kutusu (JS Kontrolü İçin) */
+        .alert-box {
+            display: none;
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="brand">KİŞİSEL BLOG</div>
+                <div class="nav-links">
+                    <a href="#makaleler">Makaleler</a>
+                    <a href="#hakkimda">Hakkında</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <div id="alertBox" class="alert-box"></div>
+
+        <section id="makaleler">
+            <article class="post-card">
+                <div class="post-meta">25 Haziran 2026 • Teknoloji</div>
+                <h2 class="post-title">Netlify ile Statik Web Mimarisi ve Dağıtım Süreçleri</h2>
+                <p class="post-excerpt">Modern web geliştirme süreçlerinde statik site oluşturucuları ve sunucusuz mimariler, geleneksel sunucu maliyetlerini ve güvenlik açıklarını minimuma indirmektedir. Netlify, Git entegrasyonu sayesinde CI/CD süreçlerini tamamen otomatik hale getirmektedir.</p>
+                <button class="btn" onclick="goster('Netlify makalesinin devamı sistem entegrasyonu aşamasındadır.')">Devamını Oku</button>
+            </article>
+
+            <article class="post-card">
+                <div class="post-meta">18 Haziran 2026 • Yazılım Kuralları</div>
+                <h2 class="post-title">Yazılım Projelerinde Kurumsal ve Resmi Dil Tercihi</h2>
+                <p class="post-excerpt">Kullanıcı arayüzlerinde ve uygulama içi kayıtlarda resmi bir dilin benimsenmesi, yazılım ürününün profesyonel standartlara uygunluğunu ve güvenilirliğini artırır. Gayriresmi hitaplar, projenin ciddiyetini zedeleyebilmektedir.</p>
+                <button class="btn" onclick="goster('Arayüz standartları makalesinin teknik dokümantasyonu hazırlanmaktadır.')">Devamını Oku</button>
+            </article>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            &copy; 2026 Tüm Hakları Saklıdır. Yazılım ve Altyapı Yönetimi.
+        </div>
+    </footer>
+
+    <script>
+        // İnteraktif İşlevsellik Kontrolü
+        function goster(mesaj) {
+            const alertBox = document.getElementById('alertBox');
+            alertBox.innerText = mesaj;
+            alertBox.style.display = 'block';
+            
+            // 4 saniye sonra bildirimi otomatik gizle
+            setTimeout(function() {
+                alertBox.style.display = 'none';
+            }, 4000);
+        }
+    </script>
+
+</body>
+</html>
