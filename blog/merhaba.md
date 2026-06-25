@@ -1,4 +1,4 @@
-Category:ilkler
+CATeGORy:ilkler
 # Blog Sitemiz İçin Yeni Sistem
 kodladığımız Bu sistemde , Atx-B motorlarını Kulanıyor ve sürekli günceliyoruz şuanda 3 sürüm Bulunmaktadır!
 
