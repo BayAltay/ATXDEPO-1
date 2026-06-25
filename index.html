@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Anteax Team - Resmi Blog</title>
+    <title>Anteax Team - Otomatik Blog</title>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -14,10 +14,8 @@
         main { margin-top: 40px; }
         .post-card { background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 6px; padding: 30px; margin-bottom: 25px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
         .post-meta { font-size: 12px; color: #7f8c8d; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; }
-        /* Markdown İçerik Stilleri */
         .post-content h1, .post-content h2 { color: #2c3e50; margin: 15px 0 10px 0; }
         .post-content p { margin-bottom: 15px; color: #4a5568; }
-        .post-content code { background: #edf2f7; padding: 2px 6px; border-radius: 4px; font-family: monospace; }
         footer { background-color: #1a252f; color: #7f8c8d; text-align: center; padding: 20px 0; font-size: 13px; position: fixed; bottom: 0; width: 100%; }
     </style>
 </head>
@@ -25,7 +23,7 @@
 
     <header>
         <div class="container">
-            <a href="#" class="brand">ANTEAX TEAM MERKEZİ BLOG</a>
+            <a href="#" class="brand">ANTEAX TEAM OTOMATİK BLOG</a>
         </div>
     </header>
 
@@ -37,32 +35,42 @@
     </footer>
 
     <script>
-        // 1. Adım: Yazıların listesini tutan JSON dosyasını çekiyoruz
-        fetch('yazilar.json')
+        // DIKKAT: Buradaki bilgileri kendi hesabına göre doldur aga!
+        const githubKullaniciAdi = "GITHUB_KULLANICI_ADIN"; 
+        const depoAdi = "DEPO_ADIN"; 
+
+        // 1. Adım: GitHub API'sini kullanarak blog klasöründeki tüm dosyaları listeliyoruz
+        const apiUrl = `https://api.github.com/repos/${BayAltay}/${ATXDEPO-1}/contents/blog`;
+
+        fetch(apiUrl)
             .then(response => response.json())
-            .then(yazilar => {
+            .then(dosyalar => {
                 const container = document.getElementById('blogContainer');
                 
-                // 2. Adım: Her yazı için ilgili .md dosyasını arka planda okuyoruz
-                yazilar.forEach(yazi => {
-                    fetch('blog/' + yazi.dosya)
+                // Sadece .md uzantılı olan dosyaları filtreliyoruz
+                const mdDosyalari = dosyalar.filter(dosya => dosya.name.endsWith('.md'));
+
+                mdDosyalari.forEach(dosya => {
+                    // 2. Adım: Her bir .md dosyasının içeriğini çekiyoruz
+                    fetch(dosya.download_url)
                         .then(res => res.text())
                         .then(markdownMetni => {
-                            // 3. Adım: Markdown'ı HTML'e çeviriyoruz
+                            // 3. Adım: Markdown'ı HTML'e çevirip ekrana basıyoruz
                             const htmlIcerik = marked.parse(markdownMetni);
                             
-                            // Kart yapısını oluşturup ekrana basıyoruz
                             const kart = document.createElement('article');
                             kart.className = 'post-card';
+                            
+                            // Dosya adından veya içeriğinden tarih türetilebilir, şimdilik dosya adını gösterelim
                             kart.innerHTML = `
-                                <div class="post-meta">${yazi.tarih} • ${yazi.kategori}</div>
+                                <div class="post-meta">Sistem Dosyası: ${dosya.name}</div>
                                 <div class="post-content">${htmlIcerik}</div>
                             `;
                             container.appendChild(kart);
                         });
                 });
             })
-            .catch(err => console.error("Yazılar yüklenirken hata oluştu:", err));
+            .catch(err => console.error("GitHub API bağlantı hatası:", err));
     </script>
 </body>
 </html>
