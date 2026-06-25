@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Anteax Team - Resmi Blog</title>
-    <!-- Markdown İşleme Motoru -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify/dist/purify.min.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8f9fa; color: #212529; line-height: 1.6; padding-bottom: 80px; }
@@ -27,6 +27,7 @@
         
         /* Durum Mesajları */
         .status-message { text-align: center; color: #7f8c8d; padding: 40px; font-weight: 500; background: #ffffff; border-radius: 6px; border: 1px solid #e2e8f0; }
+        .status-message.error { color: #e74c3c; }
         
         footer { background-color: #1a252f; color: #7f8c8d; text-align: center; padding: 20px 0; font-size: 13px; position: fixed; bottom: 0; width: 100%; border-top: 1px solid #2c3e50; }
     </style>
@@ -48,14 +49,20 @@
     </footer>
 
     <script>
-        // Tanımlanan Resmi GitHub API Bilgileri
-        const username = "BayAltay";
-        const repo = "ATXDEPO-1";
-        const path = "blog";
+        // Yapılandırma
+        const CONFIG = {
+            username: "BayAltay",
+            repo: "ATXDEPO-1",
+            path: "blog",
+            requestDelay: 200
+        };
 
-        const apiUrl = `https://api.github.com/repos/${username}/${repo}/contents/${path}`;
+        const apiUrl = `https://api.github.com/repos/${CONFIG.username}/${CONFIG.repo}/contents/${CONFIG.path}`;
 
-        // Asenkron Motor Fonksiyonu (Sıralı ve Güvenli Yükleme İçin)
+        // Gecikme Fonksiyonu (Rate Limiting)
+        const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+        // Ana Motor Fonksiyonu
         async function bloglariGetir() {
             const container = document.getElementById('blogContainer');
             const statusBox = document.getElementById('statusBox');
@@ -67,9 +74,12 @@
                 }
 
                 const veriler = await response.json();
+                if (!Array.isArray(veriler)) {
+                    throw new Error("Geçersiz API yanıtı alındı.");
+                }
                 
                 // Sadece .md uzantılı dosyaları filtrele
-                const mdDosyalari = veriler.filter(dosya => dosya.name.toLowerCase().endsWith('.md'));
+                const mdDosyalari = veriler.filter(dosya => dosya.name && dosya.name.toLowerCase().endsWith('.md'));
 
                 if (mdDosyalari.length === 0) {
                     statusBox.innerText = "Sistem klasöründe (.md) uzantılı herhangi bir döküman tespit edilemedi.";
@@ -79,33 +89,55 @@
                 // Yükleniyor yazısını kaldır
                 statusBox.style.display = "none";
 
-                // Dosyaları sırayla oku ve ekrana bas (Asenkron Döngü)
+                // Dosyaları sırayla oku ve ekrana bas
                 for (const dosya of mdDosyalari) {
-                    try {
-                        const dosyaResponse = await fetch(dosya.download_url);
-                        const markdownMetni = await dosyaResponse.text();
-                        
-                        // Markdown'ı HTML koduna dönüştür
-                        const htmlIcerik = marked.parse(markdownMetni);
-
-                        // Yeni kart yapısını oluştur
-                        const kart = document.createElement('article');
-                        kart.className = 'post-card';
-                        kart.innerHTML = `
-                            <div class="post-meta">Sistem Arşivi: ${dosya.name}</div>
-                            <div class="post-content">${htmlIcerik}</div>
-                        `;
-                        
-                        container.appendChild(kart);
-                    } catch (dosyaHatasi) {
-                        console.error(`${dosya.name} içeriği okunurken hata:`, dosyaHatasi);
-                    }
+                    await delay(CONFIG.requestDelay);
+                    await renderBlogPost(dosya, container);
                 }
 
             } catch (anaHata) {
-                statusBox.style.color = "#e74c3c";
-                statusBox.innerText = `Bağlantı Başarısız: Sunucu verileri çekemedi. (Detay: ${anaHata.message})`;
+                statusBox.classList.add('error');
+                statusBox.innerText = `Bağlantı Başarısız: ${anaHata.message}`;
                 console.error("Sistem Hatası:", anaHata);
+            }
+        }
+
+        // Blog Yazısını Render Et
+        async function renderBlogPost(dosya, container) {
+            try {
+                const dosyaResponse = await fetch(dosya.download_url);
+                if (!dosyaResponse.ok) {
+                    throw new Error(`${dosya.name} indirilemedi`);
+                }
+
+                const markdownMetni = await dosyaResponse.text();
+                
+                // Markdown'ı HTML koduna dönüştür
+                const htmlIcerik = marked.parse(markdownMetni);
+                
+                // XSS Koruması - DOMPurify ile Temizle
+                const cleanHtml = DOMPurify.sanitize(htmlIcerik);
+
+                // Yeni kart yapısını oluştur
+                const kart = document.createElement('article');
+                kart.className = 'post-card';
+
+                // Meta bilgisini güvenli şekilde ekle
+                const metaDiv = document.createElement('div');
+                metaDiv.className = 'post-meta';
+                metaDiv.textContent = `Sistem Arşivi: ${dosya.name}`;
+
+                // İçeriği güvenli şekilde ekle
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'post-content';
+                contentDiv.innerHTML = cleanHtml;
+
+                kart.appendChild(metaDiv);
+                kart.appendChild(contentDiv);
+                container.appendChild(kart);
+
+            } catch (dosyaHatasi) {
+                console.error(`${dosya.name} işlenirken hata:`, dosyaHatasi);
             }
         }
 
@@ -114,4 +146,4 @@
     </script>
 </body>
 </html>
-<!-- ==== Anteax Blog Engine | Atx-B 0.1 ==== -->
+<!-- ==== Anteax Blog Engine | Atx-B 0.2 (İyileştirilmiş) ==== -->
