@@ -13,8 +13,63 @@
         .container { max-width: 800px; margin: 0 auto; padding: 0 20px; }
         .brand { font-size: 22px; font-weight: 700; color: #3498db; text-decoration: none; letter-spacing: 1px; }
         main { margin-top: 40px; }
-        .post-card { background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 6px; padding: 30px; margin-bottom: 25px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .post-meta { font-size: 12px; color: #7f8c8d; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; }
+        
+        /* Kategori Filtresi */
+        .category-filter { 
+            display: flex; 
+            flex-wrap: wrap; 
+            gap: 10px; 
+            margin-bottom: 30px; 
+            padding: 20px; 
+            background-color: #ffffff; 
+            border-radius: 6px; 
+            border: 1px solid #e2e8f0;
+        }
+        .category-btn { 
+            padding: 8px 16px; 
+            border: 2px solid #3498db; 
+            background-color: #ffffff; 
+            color: #3498db; 
+            border-radius: 20px; 
+            cursor: pointer; 
+            font-size: 13px; 
+            font-weight: 600; 
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .category-btn:hover { 
+            background-color: #ecf0f1; 
+        }
+        .category-btn.active { 
+            background-color: #3498db; 
+            color: #ffffff; 
+        }
+        .category-btn.all { 
+            border-color: #2c3e50; 
+            color: #2c3e50;
+        }
+        .category-btn.all.active { 
+            background-color: #2c3e50; 
+            color: #ffffff;
+        }
+        
+        .post-card { background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 6px; padding: 30px; margin-bottom: 25px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .post-card:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        .post-card.hidden { display: none; }
+        
+        .post-meta { font-size: 12px; color: #7f8c8d; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+        .post-filename { color: #7f8c8d; }
+        .post-category { 
+            background-color: #3498db; 
+            color: #ffffff; 
+            padding: 4px 10px; 
+            border-radius: 12px; 
+            font-size: 11px; 
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
         
         /* Kurumsal Markdown Metin Tasarımları */
         .post-content h1 { font-size: 26px; color: #2c3e50; margin-bottom: 15px; font-weight: 600; }
@@ -28,6 +83,8 @@
         /* Durum Mesajları */
         .status-message { text-align: center; color: #7f8c8d; padding: 40px; font-weight: 500; background: #ffffff; border-radius: 6px; border: 1px solid #e2e8f0; }
         .status-message.error { color: #e74c3c; }
+        
+        .no-posts { text-align: center; color: #7f8c8d; padding: 40px; font-weight: 500; }
         
         footer { background-color: #1a252f; color: #7f8c8d; text-align: center; padding: 20px 0; font-size: 13px; position: fixed; bottom: 0; width: 100%; border-top: 1px solid #2c3e50; }
     </style>
@@ -58,6 +115,10 @@
         };
 
         const apiUrl = `https://api.github.com/repos/${CONFIG.username}/${CONFIG.repo}/contents/${CONFIG.path}`;
+
+        // Global değişkenler
+        let tumBloglar = [];
+        let aktifKategori = 'all';
 
         // Gecikme Fonksiyonu (Rate Limiting)
         const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
@@ -95,6 +156,9 @@
                     await renderBlogPost(dosya, container);
                 }
 
+                // Kategori filtresi oluştur
+                kategoriFilteriOlustur();
+
             } catch (anaHata) {
                 statusBox.classList.add('error');
                 statusBox.innerText = `Bağlantı Başarısız: ${anaHata.message}`;
@@ -112,8 +176,16 @@
 
                 const markdownMetni = await dosyaResponse.text();
                 
+                // Kategoriyi markdown'ın başından çıkart
+                const kategoriRegex = /^category:\s*(.+?)$/m;
+                const kategoriMatch = markdownMetni.match(kategoriRegex);
+                const kategori = kategoriMatch ? kategoriMatch[1].trim() : "Diğer";
+                
+                // Metadata'yı sil
+                const temizMarkdown = markdownMetni.replace(/^category:.*$/m, '').trim();
+                
                 // Markdown'ı HTML koduna dönüştür
-                const htmlIcerik = marked.parse(markdownMetni);
+                const htmlIcerik = marked.parse(temizMarkdown);
                 
                 // XSS Koruması - DOMPurify ile Temizle
                 const cleanHtml = DOMPurify.sanitize(htmlIcerik);
@@ -121,11 +193,22 @@
                 // Yeni kart yapısını oluştur
                 const kart = document.createElement('article');
                 kart.className = 'post-card';
+                kart.setAttribute('data-category', kategori.toLowerCase());
 
                 // Meta bilgisini güvenli şekilde ekle
                 const metaDiv = document.createElement('div');
                 metaDiv.className = 'post-meta';
-                metaDiv.textContent = `Sistem Arşivi: ${dosya.name}`;
+
+                const filenameSpan = document.createElement('span');
+                filenameSpan.className = 'post-filename';
+                filenameSpan.textContent = `Sistem Arşivi: ${dosya.name}`;
+
+                const categorySpan = document.createElement('span');
+                categorySpan.className = 'post-category';
+                categorySpan.textContent = kategori;
+
+                metaDiv.appendChild(filenameSpan);
+                metaDiv.appendChild(categorySpan);
 
                 // İçeriği güvenli şekilde ekle
                 const contentDiv = document.createElement('div');
@@ -136,8 +219,87 @@
                 kart.appendChild(contentDiv);
                 container.appendChild(kart);
 
+                // Blog nesnesini kaydet
+                tumBloglar.push({
+                    kategori: kategori.toLowerCase(),
+                    element: kart
+                });
+
             } catch (dosyaHatasi) {
                 console.error(`${dosya.name} işlenirken hata:`, dosyaHatasi);
+            }
+        }
+
+        // Kategori Filtresi Oluştur
+        function kategoriFilteriOlustur() {
+            // Unique kategoriler bul
+            const kategoriler = new Set(tumBloglar.map(blog => blog.kategori));
+            const sortedKategoriler = Array.from(kategoriler).sort();
+
+            // Filtre containerını oluştur
+            const container = document.getElementById('blogContainer');
+            const filterDiv = document.createElement('div');
+            filterDiv.className = 'category-filter';
+            filterDiv.id = 'categoryFilter';
+
+            // "Tüm Yazılar" butonu
+            const allBtn = document.createElement('button');
+            allBtn.className = 'category-btn all active';
+            allBtn.textContent = 'Tüm Yazılar';
+            allBtn.setAttribute('data-category', 'all');
+            allBtn.addEventListener('click', () => kategoriAra('all'));
+            filterDiv.appendChild(allBtn);
+
+            // Kategori butonları
+            sortedKategoriler.forEach(kategori => {
+                const btn = document.createElement('button');
+                btn.className = 'category-btn';
+                btn.textContent = kategori;
+                btn.setAttribute('data-category', kategori);
+                btn.addEventListener('click', () => kategoriAra(kategori));
+                filterDiv.appendChild(btn);
+            });
+
+            // Filtre div'ini containerın başına ekle
+            container.insertBefore(filterDiv, container.firstChild);
+        }
+
+        // Kategori Arama Fonksiyonu
+        function kategoriAra(secilenKategori) {
+            aktifKategori = secilenKategori;
+
+            // Butonları güncelle
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`[data-category="${secilenKategori}"]`).classList.add('active');
+
+            // Yazıları filtrele
+            let gorunenYazi = 0;
+            tumBloglar.forEach(blog => {
+                if (secilenKategori === 'all' || blog.kategori === secilenKategori) {
+                    blog.element.classList.remove('hidden');
+                    gorunenYazi++;
+                } else {
+                    blog.element.classList.add('hidden');
+                }
+            });
+
+            // Eğer yazı yoksa mesaj göster
+            if (gorunenYazi === 0) {
+                let mesajDiv = document.getElementById('noPostsMessage');
+                if (!mesajDiv) {
+                    mesajDiv = document.createElement('div');
+                    mesajDiv.id = 'noPostsMessage';
+                    mesajDiv.className = 'no-posts';
+                    document.getElementById('categoryFilter').parentNode.insertBefore(mesajDiv, document.getElementById('categoryFilter').nextSibling);
+                }
+                mesajDiv.textContent = `'${secilenKategori}' kategorisinde yazı bulunamadı.`;
+            } else {
+                let mesajDiv = document.getElementById('noPostsMessage');
+                if (mesajDiv) {
+                    mesajDiv.remove();
+                }
             }
         }
 
@@ -146,4 +308,4 @@
     </script>
 </body>
 </html>
-<!-- ==== Anteax Blog Engine | Atx-B 0.2 A ==== -->
+<!-- ==== Anteax Blog Engine | Atx-B 0.3 B ==== -->
